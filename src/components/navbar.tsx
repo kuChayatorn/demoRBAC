@@ -1,3 +1,4 @@
+"use client";
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -25,8 +26,13 @@ import {
   SearchIcon,
   Logo,
 } from "@/components/icons";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../provider/Auth.provider";
 
 export const Navbar = () => {
+  const router = useRouter();
+  const { user, isAuthenticated, logout } = useAuth();
+
   const searchInput = (
     <Input
       aria-label="Search"
@@ -63,7 +69,7 @@ export const Navbar = () => {
               <NextLink
                 className={clsx(
                   linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
+                  "data-[active=true]:text-primary data-[active=true]:font-medium"
                 )}
                 color="foreground"
                 href={item.href}
@@ -92,17 +98,30 @@ export const Navbar = () => {
           <ThemeSwitch />
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-        <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href={siteConfig.links.sponsor}
-            startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
-          >
-            Sponsor
-          </Button>
+        <NavbarItem className="md:flex">
+          {!isAuthenticated ? (
+            <Button
+              className="text-sm font-normal text-default-600 bg-default-100"
+              variant="flat"
+              onPress={() => router.push(siteConfig.links.login)}
+            >
+              Login
+            </Button>
+          ) : (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-default-600 capitalize">
+                {user?.role}
+              </span>
+              <Button
+                size="sm"
+                className="text-sm font-normal text-default-600 bg-default-100"
+                variant="flat"
+                onPress={logout}
+              >
+                Logout
+              </Button>
+            </div>
+          )}
         </NavbarItem>
       </NavbarContent>
 
